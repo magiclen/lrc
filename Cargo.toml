@@ -11,6 +11,10 @@ description = "A pure Rust implementation of LyRiCs which is a computer file for
 readme = "README.md"
 license = "MIT"
 
+[badges.travis-ci]
+repository = "magiclen/lrc"
+branch = "master"
+
 [dependencies]
 regex = "1.3.6"
 lazy_static = "1.4.0"
