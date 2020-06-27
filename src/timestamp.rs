@@ -12,7 +12,7 @@ use self::regex::Regex;
 
 lazy_static! {
     static ref TIMESTAMP_RE: Regex =
-        { Regex::new(r"^(-)?(\d{1,10}):(-)?(\d{1,2})(\.(-)?(\d{1,2}))?$").unwrap() };
+        Regex::new(r"^(-)?(\d{1,10}):(-)?(\d{1,2})(\.(-)?(\d{1,2}))?$").unwrap();
 }
 
 impl Timestamp {

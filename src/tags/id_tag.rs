@@ -10,8 +10,8 @@ use self::regex::Regex;
 use self::unicase::UniCase;
 
 lazy_static! {
-    static ref ID_LABEL_RE: Regex = { Regex::new("^[^\x00-\x08\x0A-\x1F\x7F\\[\\]:]+$").unwrap() };
-    static ref ID_TEXT_RE: Regex = { Regex::new("^[^\x00-\x08\x0A-\x1F\x7F\\[\\]]*$").unwrap() };
+    static ref ID_LABEL_RE: Regex = Regex::new("^[^\x00-\x08\x0A-\x1F\x7F\\[\\]:]+$").unwrap();
+    static ref ID_TEXT_RE: Regex = Regex::new("^[^\x00-\x08\x0A-\x1F\x7F\\[\\]]*$").unwrap();
 }
 
 /// Tags used in LRC which are in the format **[label: text]**.
