@@ -201,7 +201,7 @@ impl Lyrics {
 
             let len_dec = len - 1;
 
-            for &time_tag in time_tags.iter().take(len_dec) {
+            for time_tag in time_tags.iter().copied().take(len_dec) {
                 unsafe {
                     self.add_timed_line_unchecked(time_tag, line.clone());
                 }
