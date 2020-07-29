@@ -1,6 +1,6 @@
 [package]
 name = "lrc"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Magic Len <len@magiclen.org>"]
 edition = "2018"
 repository = "https://github.com/magiclen/lrc"
@@ -10,7 +10,7 @@ categories = ["value-formatting", "parser-implementations"]
 description = "A pure Rust implementation of LyRiCs which is a computer file format that synchronizes song lyrics with an audio file."
 readme = "README.md"
 license = "MIT"
-include = ["src/**/*", "Cargo.toml"]
+include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
 [badges.travis-ci]
 repository = "magiclen/lrc"
