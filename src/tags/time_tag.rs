@@ -21,17 +21,9 @@ impl TimeTag {
     pub fn from_str<S: AsRef<str>>(timestamp: S) -> Result<TimeTag, LyricsError> {
         let timestamp = timestamp.as_ref();
 
-        let timestamp = if timestamp.starts_with('[') {
-            timestamp[1..].trim_start()
-        } else {
-            timestamp
-        };
+        let timestamp = timestamp.strip_prefix('[').map(|s| s.trim_start()).unwrap_or(timestamp);
 
-        let timestamp = if timestamp.ends_with(']') {
-            timestamp[..(timestamp.len() - 1)].trim_end()
-        } else {
-            timestamp
-        };
+        let timestamp = timestamp.strip_suffix(']').map(|s| s.trim_end()).unwrap_or(timestamp);
 
         Ok(TimeTag(Timestamp::from_str(timestamp)?))
     }
@@ -61,9 +53,9 @@ impl FromStr for TimeTag {
     }
 }
 
-impl Into<i64> for TimeTag {
+impl From<TimeTag> for i64 {
     #[inline]
-    fn into(self) -> i64 {
-        self.0.into()
+    fn from(tt: TimeTag) -> i64 {
+        tt.0.into()
     }
 }

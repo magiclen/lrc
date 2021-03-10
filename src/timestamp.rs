@@ -149,10 +149,10 @@ impl FromStr for Timestamp {
     }
 }
 
-impl Into<i64> for Timestamp {
+impl From<Timestamp> for i64 {
     #[inline]
-    fn into(self) -> i64 {
-        self.0
+    fn from(t: Timestamp) -> i64 {
+        t.0
     }
 }
 

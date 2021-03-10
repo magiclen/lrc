@@ -15,7 +15,7 @@ lazy_static! {
 }
 
 /// Tags used in LRC which are in the format **[label: text]**.
-#[derive(Debug, Clone, Eq, Ord)]
+#[derive(Debug, Clone, Eq)]
 pub struct IDTag {
     label: UniCase<String>,
     text: String,
@@ -74,6 +74,13 @@ impl PartialOrd for IDTag {
     #[inline]
     fn partial_cmp(&self, other: &IDTag) -> Option<Ordering> {
         self.label.partial_cmp(&other.label)
+    }
+}
+
+impl Ord for IDTag {
+    #[inline]
+    fn cmp(&self, other: &IDTag) -> Ordering {
+        self.label.cmp(&other.label)
     }
 }
 
