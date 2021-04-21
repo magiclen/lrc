@@ -1,7 +1,7 @@
 LRC
 ====================
 
-[![Build Status](https://travis-ci.org/magiclen/lrc.svg?branch=master)](https://travis-ci.org/magiclen/lrc)
+[![CI](https://github.com/magiclen/lrc/actions/workflows/ci.yml/badge.svg)](https://github.com/magiclen/lrc/actions/workflows/ci.yml)
 
 A pure Rust implementation of LyRiCs which is a computer file format that synchronizes song lyrics with an audio file.
 
