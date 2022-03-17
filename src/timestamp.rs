@@ -1,14 +1,12 @@
-extern crate regex;
-
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
 pub struct Timestamp(i64);
 
 use std::fmt::{self, Display, Formatter, Write};
 use std::str::FromStr;
 
-use crate::LyricsError;
+use regex::Regex;
 
-use self::regex::Regex;
+use crate::LyricsError;
 
 lazy_static! {
     static ref TIMESTAMP_RE: Regex =

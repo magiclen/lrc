@@ -1,5 +1,3 @@
-extern crate lrc;
-
 use lrc::{IDTag, Lyrics, TimeTag};
 
 #[test]

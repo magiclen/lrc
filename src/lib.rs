@@ -6,8 +6,6 @@ A pure Rust implementation of LyRiCs which is a computer file format that synchr
 ## Examples
 
 ```rust
-extern crate lrc;
-
 use lrc::{Lyrics, IDTag, TimeTag};
 
 let mut lyrics = Lyrics::new();
@@ -31,8 +29,6 @@ assert_eq!(
 ```
 
 ```rust
-extern crate lrc;
-
 use lrc::{Lyrics, TimeTag};
 
 let lyrics = Lyrics::from_str(r"[00:12.00][01:15.00]Naku Penda Piya-Naku Taka Piya-Mpenziwe
@@ -53,8 +49,6 @@ extern crate lazy_static;
 
 #[macro_use]
 extern crate educe;
-
-extern crate regex;
 
 mod error;
 pub mod tags;

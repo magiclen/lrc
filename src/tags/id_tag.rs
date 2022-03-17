@@ -1,13 +1,10 @@
-extern crate regex;
-extern crate unicase;
-
 use std::cmp::Ordering;
 use std::fmt::{self, Display, Formatter};
 
-use crate::{IDTagErrorKind, LyricsError};
+use regex::Regex;
+use unicase::UniCase;
 
-use self::regex::Regex;
-use self::unicase::UniCase;
+use crate::{IDTagErrorKind, LyricsError};
 
 lazy_static! {
     static ref ID_LABEL_RE: Regex = Regex::new("^[^\x00-\x08\x0A-\x1F\x7F\\[\\]:]+$").unwrap();
