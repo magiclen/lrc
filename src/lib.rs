@@ -54,14 +54,15 @@ mod error;
 pub mod tags;
 mod timestamp;
 
-use std::collections::BTreeSet;
-use std::fmt::{self, Display, Formatter, Write};
-use std::rc::Rc;
-use std::str::FromStr;
-
-use regex::Regex;
+use std::{
+    collections::BTreeSet,
+    fmt::{self, Display, Formatter, Write},
+    rc::Rc,
+    str::FromStr,
+};
 
 pub use error::*;
+use regex::Regex;
 pub use tags::*;
 
 lazy_static! {
@@ -91,8 +92,8 @@ fn check_line<S: AsRef<str>>(line: S) -> Result<(), LyricsError> {
 pub struct Lyrics {
     /// Metadata about this lyrics.
     pub metadata: BTreeSet<IDTag>,
-    timed_lines: Vec<(TimeTag, Rc<str>)>,
-    lines: Vec<String>,
+    timed_lines:  Vec<(TimeTag, Rc<str>)>,
+    lines:        Vec<String>,
 }
 
 impl Lyrics {
@@ -117,7 +118,7 @@ impl Lyrics {
                 match TimeTag::from_str(tag) {
                     Ok(time_tag) => {
                         time_tags.push(time_tag);
-                    }
+                    },
                     Err(_) => {
                         let label = c.get(1).unwrap().as_str().trim();
 
@@ -133,7 +134,7 @@ impl Lyrics {
                         lyrics
                             .metadata
                             .insert(unsafe { IDTag::from_string_unchecked(label, text) });
-                    }
+                    },
                 }
 
                 line = line[tag_len..].trim_start();

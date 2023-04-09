@@ -1,5 +1,7 @@
-use std::cmp::Ordering;
-use std::fmt::{self, Display, Formatter};
+use std::{
+    cmp::Ordering,
+    fmt::{self, Display, Formatter},
+};
 
 use regex::Regex;
 use unicase::UniCase;
@@ -15,7 +17,7 @@ lazy_static! {
 #[derive(Debug, Clone, Eq)]
 pub struct IDTag {
     label: UniCase<String>,
-    text: String,
+    text:  String,
 }
 
 impl IDTag {

@@ -1,8 +1,10 @@
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
 pub struct Timestamp(i64);
 
-use std::fmt::{self, Display, Formatter, Write};
-use std::str::FromStr;
+use std::{
+    fmt::{self, Display, Formatter, Write},
+    str::FromStr,
+};
 
 use regex::Regex;
 
@@ -28,7 +30,7 @@ impl Timestamp {
                 return Err(LyricsError::ParseError(String::from(
                     "The format of the string is not incorrect. Is it mm:ss.xx?",
                 )));
-            }
+            },
         };
 
         let mut negative_minute = c.get(1).is_some();
@@ -57,12 +59,12 @@ impl Timestamp {
                 } else {
                     n
                 }
-            }
+            },
             None => {
                 negative_hundredth_second = false;
 
                 0
-            }
+            },
         };
 
         if (negative_minute && (negative_second || negative_hundredth_second))
@@ -76,11 +78,13 @@ impl Timestamp {
         if minute > 0 {
             if negative_second {
                 return Err(LyricsError::ParseError(String::from(
-                    "The format of the string is not incorrect. The number of seconds cannot be negative.",
+                    "The format of the string is not incorrect. The number of seconds cannot be \
+                     negative.",
                 )));
             } else if negative_hundredth_second {
                 return Err(LyricsError::ParseError(String::from(
-                    "The format of the string is not incorrect. The number of hundredths of a second cannot be negative.",
+                    "The format of the string is not incorrect. The number of hundredths of a \
+                     second cannot be negative.",
                 )));
             }
         }
@@ -88,11 +92,13 @@ impl Timestamp {
         if second > 0 {
             if negative_hundredth_second {
                 return Err(LyricsError::ParseError(String::from(
-                    "The format of the string is not incorrect. The number of hundredths of a second cannot be negative.",
+                    "The format of the string is not incorrect. The number of hundredths of a \
+                     second cannot be negative.",
                 )));
             } else if second >= 60 {
                 return Err(LyricsError::ParseError(String::from(
-                    "The format of the string is not incorrect. The number of seconds must be smaller than 60.",
+                    "The format of the string is not incorrect. The number of seconds must be \
+                     smaller than 60.",
                 )));
             }
         }

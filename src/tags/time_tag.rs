@@ -1,8 +1,9 @@
-use std::fmt::{self, Display, Formatter};
-use std::str::FromStr;
+use std::{
+    fmt::{self, Display, Formatter},
+    str::FromStr,
+};
 
-use crate::timestamp::Timestamp;
-use crate::LyricsError;
+use crate::{timestamp::Timestamp, LyricsError};
 
 /// Tags used in LRC which are in the format **[mm:ss.xx]** or **[mm:ss]** to represent time.
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
