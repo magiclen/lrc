@@ -9,7 +9,6 @@ homepage = "https://magiclen.org/lrc"
 keywords = ["lrc", "lyrics", "karaoke", "synced"]
 categories = ["value-formatting", "parser-implementations"]
 description = "A pure Rust implementation of LyRiCs which is a computer file format that synchronizes song lyrics with an audio file."
-readme = "README.md"
 license = "MIT"
 include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
