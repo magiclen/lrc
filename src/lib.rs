@@ -45,9 +45,6 @@ if let Some(index) = lyrics.find_timed_line_index(TimeTag::from_str("00:13.00").
 */
 
 #[macro_use]
-extern crate lazy_static;
-
-#[macro_use]
 extern crate educe;
 
 mod error;
@@ -62,16 +59,16 @@ use std::{
 };
 
 pub use error::*;
+use once_cell::sync::Lazy;
 use regex::Regex;
 pub use tags::*;
 
-lazy_static! {
-    static ref LYRICS_RE: Regex = Regex::new("^[^\x00-\x08\x0A-\x1F\x7F]*$").unwrap();
-    static ref TAG_RE: Regex = Regex::new(r"\[.*:.*\]").unwrap();
-    static ref LINE_STARTS_WITH_RE: Regex =
-        Regex::new("^\\[([^\x00-\x08\x0A-\x1F\x7F\\[\\]:]*):([^\x00-\x08\x0A-\x1F\x7F\\[\\]]*)\\]")
-            .unwrap();
-}
+static LYRICS_RE: Lazy<Regex> = Lazy::new(|| Regex::new("^[^\x00-\x08\x0A-\x1F\x7F]*$").unwrap());
+static TAG_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\[.*:.*\]").unwrap());
+static LINE_STARTS_WITH_RE: Lazy<Regex> = Lazy::new(|| {
+    Regex::new("^\\[([^\x00-\x08\x0A-\x1F\x7F\\[\\]:]*):([^\x00-\x08\x0A-\x1F\x7F\\[\\]]*)\\]")
+        .unwrap()
+});
 
 fn check_line<S: AsRef<str>>(line: S) -> Result<(), LyricsError> {
     let line = line.as_ref();

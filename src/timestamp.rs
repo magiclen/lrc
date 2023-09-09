@@ -6,14 +6,13 @@ use std::{
     str::FromStr,
 };
 
+use once_cell::sync::Lazy;
 use regex::Regex;
 
 use crate::LyricsError;
 
-lazy_static! {
-    static ref TIMESTAMP_RE: Regex =
-        Regex::new(r"^(-)?(\d{1,10}):(-)?(\d{1,2})(\.(-)?(\d{1,2}))?$").unwrap();
-}
+static TIMESTAMP_RE: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"^(-)?(\d{1,10}):(-)?(\d{1,2})(\.(-)?(\d{1,2}))?$").unwrap());
 
 impl Timestamp {
     /// Create a timestamp with a number in milliseconds.
