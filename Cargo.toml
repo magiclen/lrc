@@ -1,9 +1,9 @@
 [package]
 name = "lrc"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["Magic Len <len@magiclen.org>"]
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.61"
 repository = "https://github.com/magiclen/lrc"
 homepage = "https://magiclen.org/lrc"
 keywords = ["lrc", "lyrics", "karaoke", "synced"]
