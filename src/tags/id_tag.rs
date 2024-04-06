@@ -61,6 +61,14 @@ impl IDTag {
             text,
         }
     }
+
+    pub fn label(&self) -> &UniCase<String> {
+        &self.label
+    }
+
+    pub fn text(&self) -> &str {
+        &self.text
+    }
 }
 
 impl PartialEq for IDTag {
