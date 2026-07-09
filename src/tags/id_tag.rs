@@ -19,7 +19,6 @@ static ID_TEXT_RE: LazyLock<Regex> =
 #[educe(PartialEq, Eq, PartialOrd, Ord)]
 pub struct IDTag {
     label: UniCase<String>,
-    #[educe(PartialEq(ignore), PartialOrd(ignore))]
     text:  String,
 }
 
@@ -31,25 +30,29 @@ impl IDTag {
         text: T,
     ) -> Result<IDTag, LyricsError> {
         let label = label.into();
+        let label = label.trim();
 
-        if !ID_LABEL_RE.is_match(label.trim()) {
+        if !ID_LABEL_RE.is_match(label) {
             return Err(LyricsError::IDTagError(IDTagErrorKind::Label));
         }
 
         let text = text.into();
+        let text = text.trim();
 
-        if !ID_TEXT_RE.is_match(&text) {
+        if !ID_TEXT_RE.is_match(text) {
             return Err(LyricsError::IDTagError(IDTagErrorKind::Text));
         }
 
         Ok(IDTag {
-            label: UniCase::new(label),
-            text,
+            label: UniCase::new(label.to_string()), text: text.to_string()
         })
     }
 
     /// Create an `IDTag` instance from strings without checking.
-    #[allow(clippy::missing_safety_doc)]
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure the label and text follow the same invariants as `IDTag::from_string`, including valid LRC characters and already-normalized surrounding whitespace.
     #[inline]
     pub unsafe fn from_string_unchecked<L: Into<String>, T: Into<String>>(
         label: L,
@@ -63,11 +66,21 @@ impl IDTag {
             text,
         }
     }
+
+    #[inline]
+    pub fn label(&self) -> &str {
+        self.label.as_ref()
+    }
+
+    #[inline]
+    pub fn text(&self) -> &str {
+        &self.text
+    }
 }
 
 impl Display for IDTag {
     #[inline]
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), fmt::Error> {
-        f.write_fmt(format_args!("[{}: {}]", self.label.trim(), self.text.trim()))
+        f.write_fmt(format_args!("[{}: {}]", self.label, self.text))
     }
 }

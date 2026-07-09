@@ -64,6 +64,18 @@ fn find_timestamp() {
 }
 
 #[test]
+fn metadata() {
+    let mut lyrics: Lyrics = Lyrics::new();
+
+    lyrics.metadata.insert(IDTag::from_string(" TI ", "First").unwrap());
+    lyrics.metadata.insert(IDTag::from_string("ti", "Second").unwrap());
+
+    assert_eq!(1, lyrics.metadata.len());
+    assert_eq!(Some("Second"), lyrics.metadata.get_text("Ti"));
+    assert_eq!("[ti: Second]", lyrics.to_string());
+}
+
+#[test]
 fn incorrect_positioned_tag() {
     let mut lyrics: Lyrics = Lyrics::new();
 
@@ -178,4 +190,16 @@ Plain line 2",
     let lyrics = Lyrics::from_str(r"[00:12.00][:]Naku Penda Piya-Naku Taka Piya-Mpenziwe").unwrap();
 
     assert_eq!(r"[00:12.00]", lyrics.to_string());
+}
+
+#[test]
+fn invalid_numeric_time_tag() {
+    assert!(Lyrics::from_str("[00:60.00]bad").is_err());
+}
+
+#[test]
+fn lyrics_is_send_sync() {
+    fn assert_send_sync<T: Send + Sync>() {}
+
+    assert_send_sync::<Lyrics>();
 }

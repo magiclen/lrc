@@ -33,14 +33,30 @@ impl Timestamp {
         };
 
         let mut negative_minute = c.get(1).is_some();
-        let minute = c.get(2).unwrap().as_str().parse::<u32>().unwrap();
+        let minute = match c.get(2).unwrap().as_str().parse::<i64>() {
+            Ok(minute) => minute,
+            Err(_) => {
+                return Err(LyricsError::ParseError(String::from(
+                    "The format of the string is not incorrect. The number of minutes is too \
+                     large.",
+                )));
+            },
+        };
 
         if minute == 0 {
             negative_minute = false;
         }
 
         let mut negative_second = c.get(3).is_some();
-        let second = c.get(4).unwrap().as_str().parse::<u8>().unwrap();
+        let second = match c.get(4).unwrap().as_str().parse::<i64>() {
+            Ok(second) => second,
+            Err(_) => {
+                return Err(LyricsError::ParseError(String::from(
+                    "The format of the string is not incorrect. The number of seconds is too \
+                     large.",
+                )));
+            },
+        };
 
         if second == 0 {
             negative_second = false;
@@ -49,7 +65,15 @@ impl Timestamp {
         let mut negative_hundredth_second = c.get(6).is_some();
         let hundredth_second = match c.get(7) {
             Some(n) => {
-                let n = n.as_str().parse::<u8>().unwrap();
+                let n = match n.as_str().parse::<i64>() {
+                    Ok(n) => n,
+                    Err(_) => {
+                        return Err(LyricsError::ParseError(String::from(
+                            "The format of the string is not incorrect. The number of hundredths \
+                             of a second is too large.",
+                        )));
+                    },
+                };
 
                 if n == 0 {
                     negative_hundredth_second = false;
@@ -102,8 +126,7 @@ impl Timestamp {
             }
         }
 
-        let mut millisecond =
-            minute as i64 * 60000 + second as i64 * 1000 + hundredth_second as i64 * 10;
+        let mut millisecond = minute * 60000 + second * 1000 + hundredth_second * 10;
 
         if negative_minute || negative_second || negative_hundredth_second {
             millisecond *= -1;
@@ -123,23 +146,18 @@ impl Timestamp {
 
 impl Display for Timestamp {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), fmt::Error> {
-        let mut timestamp = self.0;
+        let timestamp = self.0.unsigned_abs();
 
-        if timestamp < 0 {
+        if self.0 < 0 {
             f.write_char('-')?;
-            timestamp *= -1;
         }
 
-        let minute = timestamp / 60000;
-        let second = (timestamp % 60000) / 1000;
-        let millisecond = timestamp % 1000;
+        let hundredth_second = (timestamp + 5) / 10;
+        let minute = hundredth_second / 6000;
+        let second = (hundredth_second % 6000) / 100;
+        let hundredth_second = hundredth_second % 100;
 
-        f.write_fmt(format_args!(
-            "{:02}:{:02}.{:02}",
-            minute,
-            second,
-            f64::round(millisecond as f64 / 10f64)
-        ))
+        f.write_fmt(format_args!("{:02}:{:02}.{:02}", minute, second, hundredth_second,))
     }
 }
 
@@ -174,8 +192,14 @@ mod test {
         let t = Timestamp::new(17);
         assert_eq!("00:00.02", t.to_string());
 
+        let t = Timestamp::new(999);
+        assert_eq!("00:01.00", t.to_string());
+
         let t = Timestamp::new(1100);
         assert_eq!("00:01.10", t.to_string());
+
+        let t = Timestamp::new(59999);
+        assert_eq!("01:00.00", t.to_string());
 
         let t = Timestamp::new(1234567);
         assert_eq!("20:34.57", t.to_string());
@@ -188,6 +212,9 @@ mod test {
     fn negative_timestamp() {
         let t = Timestamp::new(-1234567);
         assert_eq!("-20:34.57", t.to_string());
+
+        let t = Timestamp::new(-999);
+        assert_eq!("-00:01.00", t.to_string());
     }
 
     #[test]
