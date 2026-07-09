@@ -1,3 +1,5 @@
+use std::io::Cursor;
+
 use lrc::{IDTag, Lyrics, TimeTag};
 
 #[test]
@@ -64,6 +66,34 @@ fn find_timestamp() {
 }
 
 #[test]
+fn shift_and_line_at() {
+    let mut lyrics: Lyrics = Lyrics::new();
+
+    lyrics.add_timed_line(TimeTag::from_str("00:12.00").unwrap(), "First").unwrap();
+    lyrics.add_timed_line(TimeTag::from_str("00:15.30").unwrap(), "Second").unwrap();
+
+    lyrics.shift(1000);
+
+    assert_eq!(None, lyrics.line_at(TimeTag::from_str("00:12.50").unwrap()));
+    assert_eq!(Some("First"), lyrics.line_at(TimeTag::from_str("00:13.00").unwrap()));
+    assert_eq!(Some("Second"), lyrics.line_at(TimeTag::from_str("00:16.30").unwrap()));
+}
+
+#[test]
+fn shifted() {
+    let mut lyrics: Lyrics = Lyrics::new();
+
+    lyrics.add_timed_line(TimeTag::from_str("00:12.00").unwrap(), "First").unwrap();
+
+    let shifted = lyrics.shifted(1000);
+
+    assert_eq!(Some("First"), lyrics.line_at(TimeTag::from_str("00:12.00").unwrap()));
+    assert_eq!(Some("First"), lyrics.line_at(TimeTag::from_str("00:12.50").unwrap()));
+    assert_eq!(None, shifted.line_at(TimeTag::from_str("00:12.50").unwrap()));
+    assert_eq!(Some("First"), shifted.line_at(TimeTag::from_str("00:13.00").unwrap()));
+}
+
+#[test]
 fn metadata() {
     let mut lyrics: Lyrics = Lyrics::new();
 
@@ -73,6 +103,17 @@ fn metadata() {
     assert_eq!(1, lyrics.metadata.len());
     assert_eq!(Some("Second"), lyrics.metadata.get_text("Ti"));
     assert_eq!("[ti: Second]", lyrics.to_string());
+}
+
+#[test]
+fn metadata_helpers() {
+    let mut lyrics: Lyrics = Lyrics::new();
+
+    lyrics.metadata.set_title("Let's Twist Again").unwrap();
+    lyrics.metadata.set_artist("Chubby Checker").unwrap();
+
+    assert_eq!(Some("Let's Twist Again"), lyrics.metadata.title());
+    assert_eq!(Some("Chubby Checker"), lyrics.metadata.artist());
 }
 
 #[test]
@@ -202,4 +243,24 @@ fn lyrics_is_send_sync() {
     fn assert_send_sync<T: Send + Sync>() {}
 
     assert_send_sync::<Lyrics>();
+}
+
+#[test]
+fn reader_writer() {
+    let lyrics = Lyrics::from_reader(Cursor::new(
+        r"[ti:Let's Twist Again]
+[00:12.00]Naku Penda Piya-Naku Taka Piya-Mpenziwe",
+    ))
+    .unwrap();
+
+    let mut output = Vec::new();
+
+    lyrics.to_writer(&mut output).unwrap();
+
+    assert_eq!(
+        r"[ti: Let's Twist Again]
+
+[00:12.00]Naku Penda Piya-Naku Taka Piya-Mpenziwe",
+        String::from_utf8(output).unwrap()
+    );
 }

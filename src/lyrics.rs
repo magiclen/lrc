@@ -17,6 +17,7 @@ static LINE_STARTS_WITH_RE: LazyLock<Regex> = LazyLock::new(|| {
         .unwrap()
 });
 
+// Plain lyric lines cannot contain bracketed tags because tags must be parsed before the line is stored.
 fn check_line<S: AsRef<str>>(line: S) -> Result<(), LyricsError> {
     let line = line.as_ref();
 
@@ -53,6 +54,7 @@ fn is_numeric_time_tag_candidate(label: &str, text: &str) -> bool {
     }
 }
 
+/// A complete LRC document with metadata, timed lyric lines, and plain lyric lines.
 #[derive(Debug, Clone, Educe)]
 #[educe(Default(new))]
 pub struct Lyrics {
@@ -65,6 +67,8 @@ pub struct Lyrics {
 impl Lyrics {
     #[allow(clippy::should_implement_trait)]
     /// Create a `Lyrics` instance with a string.
+    ///
+    /// Use the `FromStr` implementation when the input is already a `&str`.
     pub fn from_str<S: AsRef<str>>(s: S) -> Result<Lyrics, LyricsError> {
         let mut lyrics: Lyrics = Lyrics::new();
         let s = s.as_ref();
@@ -94,6 +98,7 @@ impl Lyrics {
 
                         let text = c.get(2).unwrap().as_str().trim();
 
+                        // A malformed numeric time tag should stay a parse error instead of falling back to metadata.
                         if is_numeric_time_tag_candidate(label, text) {
                             return Err(error);
                         }
@@ -118,6 +123,7 @@ impl Lyrics {
 }
 
 impl Lyrics {
+    /// Add a plain lyric line without a time tag.
     #[inline]
     pub fn add_line<S: Into<String>>(&mut self, line: S) -> Result<(), LyricsError> {
         let line = line.into();
@@ -129,6 +135,7 @@ impl Lyrics {
         Ok(())
     }
 
+    /// Add a timed lyric line.
     #[inline]
     pub fn add_timed_line<S: Into<String>>(
         &mut self,
@@ -146,6 +153,7 @@ impl Lyrics {
         Ok(())
     }
 
+    /// Add one lyric line with zero or more time tags.
     pub fn add_line_with_multiple_time_tags<S: Into<String>>(
         &mut self,
         time_tags: &[TimeTag],
@@ -180,6 +188,7 @@ impl Lyrics {
 
     #[inline]
     unsafe fn add_timed_line_unchecked(&mut self, time_tag: TimeTag, line: Arc<str>) {
+        // partition_point keeps equal timestamps in insertion order while avoiding a backward linear scan.
         let insert_index = self
             .timed_lines
             .partition_point(|(existing_time_tag, _)| existing_time_tag <= &time_tag);
@@ -189,32 +198,64 @@ impl Lyrics {
 }
 
 impl Lyrics {
+    /// Get all plain lyric lines.
     #[inline]
     pub fn get_lines(&self) -> &[String] {
         &self.lines
     }
 
+    /// Get all timed lyric lines sorted by their time tags.
     #[inline]
     pub fn get_timed_lines(&self) -> &[(TimeTag, Arc<str>)] {
         &self.timed_lines
     }
 
+    /// Remove and return a plain lyric line by index.
     #[inline]
     pub fn remove_line(&mut self, index: usize) -> String {
         self.lines.remove(index)
     }
 
+    /// Remove and return a timed lyric line by index.
     #[inline]
     pub fn remove_timed_line(&mut self, index: usize) -> (TimeTag, Arc<str>) {
         self.timed_lines.remove(index)
     }
 
+    /// Find the timed lyric line active at a timestamp.
     #[inline]
     pub fn find_timed_line_index<N: Into<i64>>(&self, timestamp: N) -> Option<usize> {
         let target_time_tag = TimeTag::new(timestamp);
+        // The line active at a timestamp is the last timed line whose time is not greater than the target.
         let index = self.timed_lines.partition_point(|(time_tag, _)| time_tag <= &target_time_tag);
 
         index.checked_sub(1)
+    }
+
+    /// Get the lyric text active at a timestamp.
+    #[inline]
+    pub fn line_at<N: Into<i64>>(&self, timestamp: N) -> Option<&str> {
+        self.find_timed_line_index(timestamp).map(|index| self.timed_lines[index].1.as_ref())
+    }
+
+    /// Shift all timed lyric lines by an offset in milliseconds.
+    ///
+    /// Values that overflow the timestamp range are saturated.
+    pub fn shift<N: Into<i64>>(&mut self, offset: N) {
+        let offset = offset.into();
+
+        for (time_tag, _) in &mut self.timed_lines {
+            *time_tag = TimeTag::new(time_tag.get_timestamp().saturating_add(offset));
+        }
+    }
+
+    /// Clone this lyrics and shift all timed lyric lines by an offset in milliseconds.
+    pub fn shifted<N: Into<i64>>(&self, offset: N) -> Lyrics {
+        let mut lyrics = self.clone();
+
+        lyrics.shift(offset);
+
+        lyrics
     }
 }
 

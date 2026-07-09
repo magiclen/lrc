@@ -6,13 +6,12 @@ A pure Rust implementation of LyRiCs which is a computer file format that synchr
 ## Examples
 
 ```rust
-use lrc::{Lyrics, IDTag, TimeTag};
+use lrc::{Lyrics, TimeTag};
 
 let mut lyrics = Lyrics::new();
 
-let metadata = &mut lyrics.metadata;
-metadata.insert(IDTag::from_string("ti", "Let's Twist Again").unwrap());
-metadata.insert(IDTag::from_string("al", "Hits Of The 60's - Vol. 2 – Oldies").unwrap());
+lyrics.metadata.set_title("Let's Twist Again").unwrap();
+lyrics.metadata.set_album("Hits Of The 60's - Vol. 2 – Oldies").unwrap();
 
 lyrics.add_timed_line(TimeTag::from_str("00:12.00").unwrap(), "Naku Penda Piya-Naku Taka Piya-Mpenziwe").unwrap();
 lyrics.add_timed_line(TimeTag::from_str("00:15.30").unwrap(), "Some more lyrics").unwrap();
@@ -34,19 +33,49 @@ use lrc::{Lyrics, TimeTag};
 let lyrics = Lyrics::from_str(r"[00:12.00][01:15.00]Naku Penda Piya-Naku Taka Piya-Mpenziwe
 [00:15.30][01:18.00]Some more lyrics ...").unwrap();
 
-if let Some(index) = lyrics.find_timed_line_index(TimeTag::from_str("00:13.00").unwrap()) {
-    let timed_lines = lyrics.get_timed_lines();
+assert_eq!(
+    Some("Naku Penda Piya-Naku Taka Piya-Mpenziwe"),
+    lyrics.line_at(TimeTag::from_str("00:13.00").unwrap())
+);
 
-    assert_eq!((TimeTag::from_str("00:12.00").unwrap(), "Naku Penda Piya-Naku Taka Piya-Mpenziwe".into()), timed_lines[index]);
-} else {
-    unreachable!();
-}
+let shifted = lyrics.shifted(1000);
+
+assert_eq!(
+    Some("Naku Penda Piya-Naku Taka Piya-Mpenziwe"),
+    lyrics.line_at(TimeTag::from_str("00:12.00").unwrap())
+);
+
+assert_eq!(None, shifted.line_at(TimeTag::from_str("00:12.00").unwrap()));
+
+assert_eq!(
+    Some("Naku Penda Piya-Naku Taka Piya-Mpenziwe"),
+    shifted.line_at(TimeTag::from_str("00:13.00").unwrap())
+);
+```
+
+```rust
+use std::io::Cursor;
+
+use lrc::Lyrics;
+
+let lyrics = Lyrics::from_reader(Cursor::new("[ti:Let's Twist Again]\n[00:12.00]Line")).unwrap();
+
+assert_eq!(Some("Let's Twist Again"), lyrics.metadata.title());
+
+let mut output = Vec::new();
+lyrics.to_writer(&mut output).unwrap();
+
+assert_eq!("[ti: Let's Twist Again]\n\n[00:12.00]Line", String::from_utf8(output).unwrap());
 ```
 */
 
 mod error;
+/// Input and output helpers for `Lyrics`.
+mod io;
 mod lyrics;
+/// Metadata helpers and storage.
 pub mod metadata;
+/// LRC tag types.
 pub mod tags;
 mod timestamp;
 

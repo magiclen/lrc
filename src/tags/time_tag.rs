@@ -16,7 +16,9 @@ impl TimeTag {
         TimeTag(Timestamp::new(timestamp))
     }
 
-    /// Create a timestamp with a string.
+    /// Create a `TimeTag` instance with a string.
+    ///
+    /// The surrounding square brackets are optional.
     #[allow(clippy::should_implement_trait)]
     #[inline]
     pub fn from_str<S: AsRef<str>>(timestamp: S) -> Result<TimeTag, LyricsError> {

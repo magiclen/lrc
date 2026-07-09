@@ -24,6 +24,8 @@ pub struct IDTag {
 
 impl IDTag {
     /// Create an `IDTag` instance from strings.
+    ///
+    /// The label and text are trimmed before they are stored.
     #[inline]
     pub fn from_string<L: Into<String>, T: Into<String>>(
         label: L,
@@ -68,11 +70,13 @@ impl IDTag {
     }
 
     #[inline]
+    /// Get this tag's label.
     pub fn label(&self) -> &str {
         self.label.as_ref()
     }
 
     #[inline]
+    /// Get this tag's text.
     pub fn text(&self) -> &str {
         &self.text
     }
