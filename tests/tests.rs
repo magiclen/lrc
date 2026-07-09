@@ -68,12 +68,14 @@ fn incorrect_positioned_tag() {
     let mut lyrics: Lyrics = Lyrics::new();
 
     assert!(lyrics.add_line("[00:15.30]Naku Penda Piya-Naku Taka Piya-Mpenziwe").is_err());
-    assert!(lyrics
-        .add_timed_line(
-            TimeTag::from_str("00:12.00").unwrap(),
-            "[00:15.30]Naku Penda Piya-Naku Taka Piya-Mpenziwe"
-        )
-        .is_err());
+    assert!(
+        lyrics
+            .add_timed_line(
+                TimeTag::from_str("00:12.00").unwrap(),
+                "[00:15.30]Naku Penda Piya-Naku Taka Piya-Mpenziwe"
+            )
+            .is_err()
+    );
 }
 
 #[test]

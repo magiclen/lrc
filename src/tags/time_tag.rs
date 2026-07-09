@@ -3,7 +3,7 @@ use std::{
     str::FromStr,
 };
 
-use crate::{timestamp::Timestamp, LyricsError};
+use crate::{LyricsError, timestamp::Timestamp};
 
 /// Tags used in LRC which are in the format **[mm:ss.xx]** or **[mm:ss]** to represent time.
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]

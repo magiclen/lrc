@@ -44,9 +44,6 @@ if let Some(index) = lyrics.find_timed_line_index(TimeTag::from_str("00:13.00").
 ```
 */
 
-#[macro_use]
-extern crate educe;
-
 mod error;
 pub mod tags;
 mod timestamp;
@@ -56,16 +53,18 @@ use std::{
     fmt::{self, Display, Formatter, Write},
     rc::Rc,
     str::FromStr,
+    sync::LazyLock,
 };
 
+use educe::Educe;
 pub use error::*;
-use once_cell::sync::Lazy;
 use regex::Regex;
 pub use tags::*;
 
-static LYRICS_RE: Lazy<Regex> = Lazy::new(|| Regex::new("^[^\x00-\x08\x0A-\x1F\x7F]*$").unwrap());
-static TAG_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\[.*:.*\]").unwrap());
-static LINE_STARTS_WITH_RE: Lazy<Regex> = Lazy::new(|| {
+static LYRICS_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new("^[^\x00-\x08\x0A-\x1F\x7F]*$").unwrap());
+static TAG_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\[.*:.*\]").unwrap());
+static LINE_STARTS_WITH_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new("^\\[([^\x00-\x08\x0A-\x1F\x7F\\[\\]:]*):([^\x00-\x08\x0A-\x1F\x7F\\[\\]]*)\\]")
         .unwrap()
 });

@@ -2,8 +2,8 @@
 name = "lrc"
 version = "0.1.8"
 authors = ["Magic Len <len@magiclen.org>"]
-edition = "2021"
-rust-version = "1.61"
+edition = "2024"
+rust-version = "1.89"
 repository = "https://github.com/magiclen/lrc"
 homepage = "https://magiclen.org/lrc"
 keywords = ["lrc", "lyrics", "karaoke", "synced"]
@@ -13,11 +13,6 @@ license = "MIT"
 include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
 [dependencies]
-regex = "1.3.6"
-once_cell = "1"
-unicase = "2.6.0"
-
-[dependencies.educe]
-version = ">=0.4.2"
-features = ["Default"]
-default-features = false
+regex = "1"
+unicase = "2"
+educe = { version = "0.7", features = ["Default", "PartialEq", "Eq", "PartialOrd", "Ord"], default-features = false }

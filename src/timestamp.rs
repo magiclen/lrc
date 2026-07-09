@@ -4,15 +4,15 @@ pub struct Timestamp(i64);
 use std::{
     fmt::{self, Display, Formatter, Write},
     str::FromStr,
+    sync::LazyLock,
 };
 
-use once_cell::sync::Lazy;
 use regex::Regex;
 
 use crate::LyricsError;
 
-static TIMESTAMP_RE: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^(-)?(\d{1,10}):(-)?(\d{1,2})(\.(-)?(\d{1,2}))?$").unwrap());
+static TIMESTAMP_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^(-)?(\d{1,10}):(-)?(\d{1,2})(\.(-)?(\d{1,2}))?$").unwrap());
 
 impl Timestamp {
     /// Create a timestamp with a number in milliseconds.

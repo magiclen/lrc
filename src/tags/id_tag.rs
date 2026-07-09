@@ -1,23 +1,25 @@
 use std::{
-    cmp::Ordering,
     fmt::{self, Display, Formatter},
+    sync::LazyLock,
 };
 
-use once_cell::sync::Lazy;
+use educe::Educe;
 use regex::Regex;
 use unicase::UniCase;
 
 use crate::{IDTagErrorKind, LyricsError};
 
-static ID_LABEL_RE: Lazy<Regex> =
-    Lazy::new(|| Regex::new("^[^\x00-\x08\x0A-\x1F\x7F\\[\\]:]+$").unwrap());
-static ID_TEXT_RE: Lazy<Regex> =
-    Lazy::new(|| Regex::new("^[^\x00-\x08\x0A-\x1F\x7F\\[\\]]*$").unwrap());
+static ID_LABEL_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new("^[^\x00-\x08\x0A-\x1F\x7F\\[\\]:]+$").unwrap());
+static ID_TEXT_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new("^[^\x00-\x08\x0A-\x1F\x7F\\[\\]]*$").unwrap());
 
 /// Tags used in LRC which are in the format **[label: text]**.
-#[derive(Debug, Clone, Eq)]
+#[derive(Debug, Clone, Educe)]
+#[educe(PartialEq, Eq, PartialOrd, Ord)]
 pub struct IDTag {
     label: UniCase<String>,
+    #[educe(PartialEq(ignore), PartialOrd(ignore))]
     text:  String,
 }
 
@@ -60,27 +62,6 @@ impl IDTag {
             label: UniCase::new(label),
             text,
         }
-    }
-}
-
-impl PartialEq for IDTag {
-    #[inline]
-    fn eq(&self, other: &IDTag) -> bool {
-        self.label.eq(&other.label)
-    }
-}
-
-impl PartialOrd for IDTag {
-    #[inline]
-    fn partial_cmp(&self, other: &IDTag) -> Option<Ordering> {
-        self.label.partial_cmp(&other.label)
-    }
-}
-
-impl Ord for IDTag {
-    #[inline]
-    fn cmp(&self, other: &IDTag) -> Ordering {
-        self.label.cmp(&other.label)
     }
 }
 
